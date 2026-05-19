@@ -20,24 +20,24 @@ export default function LandingPage() {
     }
 
     return (
-        <div className='min-h-screen bg-white'>
-            <header className='sticky top-0 z-40 bg-white/80 backdrop-blur-sm border-b border-[#e5e7eb]'>
+        <div className='min-h-screen bg-bg-primary'>
+            <header className='sticky top-0 z-40 bg-bg-primary/80 backdrop-blur-sm border-b border-border'>
                 <div className='max-w-6xl mx-auto px-6 h-14 flex items-center justify-between'>
-                    <span className='text-sm text-[#17171c] tracking-tight font-medium'>
+                    <span className='text-sm text-text-primary tracking-tight font-medium'>
                         Minamo
                     </span>
                     <nav className='flex items-center gap-8'>
                         <a
                             href='/login'
                             onClick={e => handleAuthRedirect(e, 'login')}
-                            className='text-sm text-[#75758a] hover:text-[#17171c] transition-colors'
+                            className='text-sm text-text-secondary hover:text-text-primary transition-colors'
                         >
                             ログイン
                         </a>
                         <a
                             href='/login'
                             onClick={e => handleAuthRedirect(e, 'signup')}
-                            className='text-sm px-5 py-2 bg-[#17171c] text-white rounded-full hover:opacity-90 transition-opacity'
+                            className='text-sm px-5 py-2 bg-text-primary text-bg-primary rounded-full hover:opacity-90 transition-opacity'
                         >
                             始める
                         </a>
@@ -50,29 +50,29 @@ export default function LandingPage() {
                 <section className='max-w-6xl mx-auto px-6 pt-16 pb-0 md:pt-24 md:pb-0'>
                     <div className='grid md:grid-cols-2 gap-12'>
                         <div className='max-w-xl pt-8 md:pt-16 pb-16 md:pb-20'>
-                            <p className='text-xs text-[#75758a] tracking-[0.15em] mb-6'>
+                            <p className='text-xs text-text-secondary tracking-[0.15em] mb-6'>
                                 水面 — Minamo
                             </p>
-                            <h1 className='text-5xl md:text-7xl font-light text-[#17171c] leading-[1.0] tracking-[-1.5px] md:tracking-[-2px]'>
+                            <h1 className='text-5xl md:text-7xl font-light text-text-primary leading-[1.0] tracking-[-1.5px] md:tracking-[-2px]'>
                                 自分のことを
                                 <br />
                                 もっと知っていく。
                             </h1>
-                            <p className='mt-8 text-lg text-[#75758a] leading-relaxed max-w-lg'>
+                            <p className='mt-8 text-lg text-text-secondary leading-relaxed max-w-lg'>
                                 Minamoは、日々の問いかけに答えながら自分自身の思考や感情のパターンをやさしく紐解いていく内省ツールです。
                             </p>
                             <div className='mt-10 flex items-center gap-4'>
                                 <a
                                     href='/login'
                                     onClick={e => handleAuthRedirect(e, 'signup')}
-                                    className='px-7 py-3 bg-[#17171c] text-white text-sm rounded-full hover:opacity-90 transition-opacity'
+                                    className='px-7 py-3 bg-text-primary text-bg-primary text-sm rounded-full hover:opacity-90 transition-opacity'
                                 >
                                     無料ではじめる
                                 </a>
                                 <a
                                     href='/login'
                                     onClick={e => handleAuthRedirect(e, 'login')}
-                                    className='text-sm text-[#75758a] underline underline-offset-4 hover:text-[#17171c] transition-colors'
+                                    className='text-sm text-text-secondary underline underline-offset-4 hover:text-text-primary transition-colors'
                                 >
                                     ログイン
                                 </a>
@@ -89,11 +89,11 @@ export default function LandingPage() {
                 </section>
 
                 <div className='max-w-6xl mx-auto px-6'>
-                    <div className='h-px bg-[#e5e7eb]' />
+                    <div className='h-px bg-border' />
                 </div>
 
                 <section className='max-w-6xl mx-auto px-6 py-24 md:py-32'>
-                    <p className='text-xs text-[#93939f] tracking-[0.15em] mb-14'>使い方</p>
+                    <p className='text-xs text-text-muted tracking-[0.15em] mb-14'>使い方</p>
                     <div className='grid md:grid-cols-3 gap-x-16 gap-y-12'>
                         {[
                             {
@@ -113,13 +113,13 @@ export default function LandingPage() {
                             },
                         ].map(item => (
                             <div key={item.num}>
-                                <span className='text-2xl text-[#4a6fa5]/30 font-light'>
+                                <span className='text-2xl text-accent/30 font-light'>
                                     {item.num}
                                 </span>
-                                <h3 className='mt-4 text-lg text-[#17171c] font-medium'>
+                                <h3 className='mt-4 text-lg text-text-primary font-medium'>
                                     {item.title}
                                 </h3>
-                                <p className='mt-3 text-sm text-[#75758a] leading-relaxed'>
+                                <p className='mt-3 text-sm text-text-secondary leading-relaxed'>
                                     {item.desc}
                                 </p>
                             </div>
@@ -127,9 +127,9 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                <section className='bg-[#f8f7f6]'>
+                <section className='bg-bg-secondary'>
                     <div className='max-w-6xl mx-auto px-6 py-24 md:py-32'>
-                        <p className='text-xs text-[#93939f] tracking-[0.15em] mb-14'>特徴</p>
+                        <p className='text-xs text-text-muted tracking-[0.15em] mb-14'>特徴</p>
                         <div className='grid md:grid-cols-2 gap-x-20 gap-y-14'>
                             {[
                                 {
@@ -150,11 +150,11 @@ export default function LandingPage() {
                                 },
                             ].map(item => (
                                 <div key={item.title}>
-                                    <div className='w-8 h-px bg-[#4a6fa5]/40 mb-5' />
-                                    <h3 className='text-base text-[#17171c] font-medium'>
+                                    <div className='w-8 h-px bg-accent/40 mb-5' />
+                                    <h3 className='text-base text-text-primary font-medium'>
                                         {item.title}
                                     </h3>
-                                    <p className='mt-2 text-sm text-[#75758a] leading-relaxed'>
+                                    <p className='mt-2 text-sm text-text-secondary leading-relaxed'>
                                         {item.desc}
                                     </p>
                                 </div>
@@ -164,24 +164,24 @@ export default function LandingPage() {
                 </section>
 
                 <section className='max-w-6xl mx-auto px-6 py-24 md:py-32 text-center'>
-                    <p className='text-xs text-[#93939f] tracking-[0.15em] mb-5'>水面 — Minamo</p>
-                    <h2 className='text-3xl md:text-4xl font-light text-[#17171c] leading-snug tracking-[-0.5px]'>
+                    <p className='text-xs text-text-muted tracking-[0.15em] mb-5'>水面 — Minamo</p>
+                    <h2 className='text-3xl md:text-4xl font-light text-text-primary leading-snug tracking-[-0.5px]'>
                         今日から、自分を知ることを始めてみませんか。
                     </h2>
                     <a
                         href='/login'
                         onClick={e => handleAuthRedirect(e, 'signup')}
-                        className='inline-block mt-8 px-8 py-3 bg-[#17171c] text-white text-sm rounded-full hover:opacity-90 transition-opacity'
+                        className='inline-block mt-8 px-8 py-3 bg-text-primary text-bg-primary text-sm rounded-full hover:opacity-90 transition-opacity'
                     >
                         無料ではじめる
                     </a>
                 </section>
             </main>
 
-            <footer className='max-w-6xl mx-auto px-6 py-8 border-t border-[#e5e7eb]'>
+            <footer className='max-w-6xl mx-auto px-6 py-8 border-t border-border'>
                 <div className='flex items-center justify-between'>
-                    <span className='text-xs text-[#93939f]'>Minamo</span>
-                    <span className='text-xs text-[#93939f]/60'>
+                    <span className='text-xs text-text-muted'>Minamo</span>
+                    <span className='text-xs text-text-muted/60'>
                         水面 — 自分を知る、毎日少しずつ。
                     </span>
                 </div>

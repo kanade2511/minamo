@@ -152,7 +152,7 @@ export default function InlineConversation({
                             <div
                                 className={`rounded-lg px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
                                     msg.role === 'assistant'
-                                        ? 'bg-white border border-border text-text-primary'
+                                        ? 'bg-surface-card border border-border text-text-primary'
                                         : 'bg-accent/10 text-text-primary'
                                 }`}
                             >
@@ -166,7 +166,7 @@ export default function InlineConversation({
                     <div className='flex justify-start'>
                         <div className='max-w-[80%]'>
                             <p className='text-[10px] text-accent/50 mb-1 tracking-wider'>Mirror</p>
-                            <div className='rounded-lg px-4 py-3 bg-white border border-border'>
+                            <div className='rounded-lg px-4 py-3 bg-surface-card border border-border'>
                                 <div className='flex gap-1.5'>
                                     <span
                                         className='w-1.5 h-1.5 rounded-full bg-accent/20 animate-bounce'
@@ -190,7 +190,7 @@ export default function InlineConversation({
                     <div className='flex justify-start'>
                         <div className='max-w-[80%]'>
                             <p className='text-[10px] text-accent/50 mb-1 tracking-wider'>Mirror</p>
-                            <div className='rounded-lg px-4 py-3 bg-white border border-border text-sm leading-relaxed whitespace-pre-wrap text-text-primary'>
+                            <div className='rounded-lg px-4 py-3 bg-surface-card border border-border text-sm leading-relaxed whitespace-pre-wrap text-text-primary'>
                                 {streamingText}
                                 <span className='inline-block w-1.5 h-3.5 bg-accent/40 ml-0.5 animate-pulse align-text-bottom' />
                             </div>
@@ -203,7 +203,7 @@ export default function InlineConversation({
 
             {/* Save */}
             {messages.length > 0 && !saved && (
-                <div className='px-5 py-3 border-t border-border bg-white flex items-center justify-between'>
+                <div className='px-5 py-3 border-t border-border bg-surface-card flex items-center justify-between'>
                     <p className='text-xs text-text-secondary/40'>対話を保存して振り返りに使う</p>
                     <button
                         onClick={handleSave}
@@ -215,7 +215,7 @@ export default function InlineConversation({
             )}
 
             {saved && (
-                <div className='px-5 py-3 border-t border-border bg-white'>
+                <div className='px-5 py-3 border-t border-border bg-surface-card'>
                     <p className='text-xs text-green-700/60'>
                         保存しました — タイムラインで確認できます
                     </p>
@@ -223,7 +223,7 @@ export default function InlineConversation({
             )}
 
             {/* Input */}
-            <div className='px-5 py-4 border-t border-border bg-white'>
+            <div className='px-5 py-4 border-t border-border bg-surface-card'>
                 <div className='flex items-end gap-3'>
                     <textarea
                         value={input}

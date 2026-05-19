@@ -72,7 +72,7 @@ export default function NoteEditor({ question, userId }: Props) {
                     <div className='space-y-3'>
                         <button
                             onClick={() => setMode('question')}
-                            className='w-full text-left px-6 py-5 rounded-lg border border-border hover:border-accent/30 transition-colors bg-white'
+                            className='w-full text-left px-6 py-5 rounded-lg border border-border hover:border-accent/30 transition-colors bg-surface-card'
                         >
                             <p className='text-sm text-accent mb-1'>今日の問いに答える</p>
                             <p className='text-xs text-text-secondary/50 leading-relaxed'>
@@ -82,7 +82,7 @@ export default function NoteEditor({ question, userId }: Props) {
 
                         <button
                             onClick={() => setMode('free')}
-                            className='w-full text-left px-6 py-5 rounded-lg border border-border hover:border-accent/30 transition-colors bg-white'
+                            className='w-full text-left px-6 py-5 rounded-lg border border-border hover:border-accent/30 transition-colors bg-surface-card'
                         >
                             <p className='text-sm text-text-primary mb-1'>自由に書く</p>
                             <p className='text-xs text-text-secondary/50'>
@@ -134,7 +134,7 @@ export default function NoteEditor({ question, userId }: Props) {
                         <button
                             onClick={handleSave}
                             disabled={isSaving || !content.trim()}
-                            className='px-6 py-2.5 bg-[#17171c] text-white text-sm rounded-full disabled:opacity-30 hover:opacity-90 transition-opacity'
+                            className='px-6 py-2.5 bg-text-primary text-bg-primary text-sm rounded-full disabled:opacity-30 hover:opacity-90 transition-opacity'
                         >
                             {isSaving ? '保存中...' : '保存'}
                         </button>
@@ -142,7 +142,7 @@ export default function NoteEditor({ question, userId }: Props) {
                         {savedNote && (
                             <button
                                 onClick={handleNewNote}
-                                className='px-6 py-2.5 border border-[#d9d9dd] text-[#75758a] text-sm rounded-full hover:border-[#17171c] hover:text-[#17171c] transition-colors'
+                                className='px-6 py-2.5 border border-border-strong text-text-secondary text-sm rounded-full hover:border-text-primary hover:text-text-primary transition-colors'
                             >
                                 新しいノートを書く
                             </button>

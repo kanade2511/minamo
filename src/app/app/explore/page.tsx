@@ -55,7 +55,7 @@ export default async function ExplorePage() {
                         <Link
                             key={note.id}
                             href={`/app/explore/${note.id}`}
-                            className='block p-5 rounded-lg border border-border hover:border-accent/30 transition-colors bg-white'
+                            className='block p-5 rounded-lg border border-border hover:border-accent/30 transition-colors bg-surface-card'
                         >
                             <div className='flex items-start justify-between gap-4'>
                                 <div className='min-w-0 flex-1'>

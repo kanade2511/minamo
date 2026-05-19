@@ -73,19 +73,19 @@ export default function NavBar() {
 
     const linkClass = (active: boolean) =>
         `text-sm transition-colors ${
-            active ? 'text-[#17171c] font-medium' : 'text-[#75758a] hover:text-[#17171c]'
+            active ? 'text-text-primary font-medium' : 'text-text-secondary hover:text-text-primary'
         }`
 
     const menuLinkClass = (active: boolean) =>
         `block w-full py-4 text-xl tracking-tight text-center transition-colors ${
-            active ? 'text-[#17171c] font-medium' : 'text-[#75758a] hover:text-[#17171c]'
+            active ? 'text-text-primary font-medium' : 'text-text-secondary hover:text-text-primary'
         }`
 
     return (
         <>
-            <header className='sticky top-0 z-40 bg-white/80 backdrop-blur-sm border-b border-[#e5e7eb]'>
+            <header className='sticky top-0 z-40 bg-bg-primary/80 backdrop-blur-sm border-b border-border'>
                 <div className='max-w-6xl mx-auto px-6 h-14 flex items-center justify-between'>
-                    <Link href='/app' className='text-sm text-[#17171c] tracking-tight font-medium'>
+                    <Link href='/app' className='text-sm text-text-primary tracking-tight font-medium'>
                         Minamo
                     </Link>
 
@@ -100,15 +100,15 @@ export default function NavBar() {
                                 {link.label}
                             </Link>
                         ))}
-                        <div className='h-4 w-px bg-[#e5e7eb]' />
+                        <div className='h-4 w-px bg-border' />
                         {email && (
-                            <span className='text-xs text-[#93939f]'>
+                            <span className='text-xs text-text-muted'>
                                 {email.length > 24 ? `${email.slice(0, 24)}…` : email}
                             </span>
                         )}
                         <button
                             onClick={handleLogout}
-                            className='text-xs text-[#93939f] hover:text-[#17171c] transition-colors'
+                            className='text-xs text-text-muted hover:text-text-primary transition-colors'
                         >
                             ログアウト
                         </button>
@@ -121,13 +121,13 @@ export default function NavBar() {
                         aria-label={menuOpen ? 'メニューを閉じる' : 'メニューを開く'}
                     >
                         <span
-                            className={`block w-5 h-px bg-[#17171c] transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-[6px]' : ''}`}
+                            className={`block w-5 h-px bg-text-primary transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-[6px]' : ''}`}
                         />
                         <span
-                            className={`block w-5 h-px bg-[#17171c] transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`}
+                            className={`block w-5 h-px bg-text-primary transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`}
                         />
                         <span
-                            className={`block w-5 h-px bg-[#17171c] transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-[6px]' : ''}`}
+                            className={`block w-5 h-px bg-text-primary transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-[6px]' : ''}`}
                         />
                     </button>
                 </div>
@@ -137,7 +137,7 @@ export default function NavBar() {
             {menuOpen && (
                 <div
                     ref={overlayRef}
-                    className='fixed inset-0 z-30 flex flex-col items-center justify-center bg-white/70 backdrop-blur-xl md:hidden animate-[fadeIn_0.2s_ease-out]'
+                    className='fixed inset-0 z-30 flex flex-col items-center justify-center bg-bg-primary/70 backdrop-blur-xl md:hidden animate-[fadeIn_0.2s_ease-out]'
                     onClick={e => {
                         if (e.target === overlayRef.current) setMenuOpen(false)
                     }}
@@ -159,7 +159,7 @@ export default function NavBar() {
                         ))}
 
                         <div
-                            className='w-8 h-px bg-[#d9d9dd] my-5'
+                            className='w-8 h-px bg-border-strong my-5'
                             style={{
                                 animation: `nav-item-in 0.35s ease-out forwards`,
                                 animationDelay: `${navLinks.length * 0.07}s`,
@@ -169,7 +169,7 @@ export default function NavBar() {
 
                         {email && (
                             <div
-                                className='text-xs text-[#93939f] py-2 text-center'
+                                className='text-xs text-text-muted py-2 text-center'
                                 style={{
                                     animation: `nav-item-in 0.35s ease-out forwards`,
                                     animationDelay: `${(navLinks.length + 1) * 0.07}s`,
@@ -182,7 +182,7 @@ export default function NavBar() {
 
                         <button
                             onClick={handleLogout}
-                            className='text-xs text-[#93939f] hover:text-[#17171c] transition-colors py-2 text-center'
+                            className='text-xs text-text-muted hover:text-text-primary transition-colors py-2 text-center'
                             style={{
                                 animation: `nav-item-in 0.35s ease-out forwards`,
                                 animationDelay: `${(navLinks.length + (email ? 2 : 1)) * 0.07}s`,
