@@ -34,22 +34,28 @@ export default function LandingPage() {
       </header>
 
       <main>
-        <section className="max-w-6xl mx-auto px-6 pt-28 pb-24 md:pt-40 md:pb-32">
-          <div className="max-w-3xl">
-            <p className="text-xs text-[#75758a] tracking-[0.15em] mb-6">水面 — Minamo</p>
-            <h1 className="text-5xl md:text-7xl font-light text-[#17171c] leading-[1.0] tracking-[-1.5px] md:tracking-[-2px]">
-              自分のことを<br />もっと知っていく。
-            </h1>
-            <p className="mt-8 text-lg text-[#75758a] leading-relaxed max-w-lg">
-              Minamoは、日々の問いかけに答えながら自分自身の思考や感情のパターンをやさしく紐解いていく内省ツールです。
-            </p>
-            <div className="mt-10 flex items-center gap-4">
-              <Link href="/login" className="px-7 py-3 bg-[#17171c] text-white text-sm rounded-full hover:opacity-90 transition-opacity">
-                無料ではじめる
-              </Link>
-              <Link href="/login" className="text-sm text-[#75758a] underline underline-offset-4 hover:text-[#17171c] transition-colors">
-                ログイン
-              </Link>
+        {/* Hero section: text left, image right full-height */}
+        <section className="max-w-6xl mx-auto px-6 pt-16 pb-0 md:pt-24 md:pb-0">
+          <div className="grid md:grid-cols-2 gap-12">
+            <div className="max-w-xl pt-8 md:pt-16 pb-16 md:pb-20">
+              <p className="text-xs text-[#75758a] tracking-[0.15em] mb-6">水面 — Minamo</p>
+              <h1 className="text-5xl md:text-7xl font-light text-[#17171c] leading-[1.0] tracking-[-1.5px] md:tracking-[-2px]">
+                自分のことを<br />もっと知っていく。
+              </h1>
+              <p className="mt-8 text-lg text-[#75758a] leading-relaxed max-w-lg">
+                Minamoは、日々の問いかけに答えながら自分自身の思考や感情のパターンをやさしく紐解いていく内省ツールです。
+              </p>
+              <div className="mt-10 flex items-center gap-4">
+                <Link href="/login" className="px-7 py-3 bg-[#17171c] text-white text-sm rounded-full hover:opacity-90 transition-opacity">
+                  無料ではじめる
+                </Link>
+                <Link href="/login" className="text-sm text-[#75758a] underline underline-offset-4 hover:text-[#17171c] transition-colors">
+                  ログイン
+                </Link>
+              </div>
+            </div>
+            <div className="-mr-6 -mt-16 md:-mt-24 overflow-hidden">
+              <img src="/minamo-hero.jpg" alt="" className="w-full h-full object-cover" />
             </div>
           </div>
         </section>
