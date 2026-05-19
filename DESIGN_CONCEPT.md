@@ -81,8 +81,8 @@ CREATE TABLE themes (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- User journal entries
-CREATE TABLE entries (
+-- Journal notes
+CREATE TABLE notes (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    UUID REFERENCES auth.users(id) NOT NULL,
   theme_id   UUID REFERENCES themes(id),
@@ -91,16 +91,14 @@ CREATE TABLE entries (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- LLM analysis results for each entry
-CREATE TABLE entry_analyses (
+-- Deep-dive insights (result of LLM conversation)
+CREATE TABLE insights (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  entry_id   UUID REFERENCES entries(id) ON DELETE CASCADE,
+  note_id    UUID REFERENCES notes(id) ON DELETE CASCADE,
   user_id    UUID REFERENCES auth.users(id) NOT NULL,
-  summary    TEXT,
-  emotions   TEXT[],
-  themes     TEXT[],
-  keywords   TEXT[],
-  embedding  VECTOR(1536),
+  dialogue   JSONB NOT NULL,
+  insight    TEXT NOT NULL,
+  tags       TEXT[],
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -120,19 +118,14 @@ CREATE TABLE summaries (
 ## RLS Policies
 
 ```sql
--- Entries: users can only access their own
-CREATE POLICY "Users can CRUD own entries"
-  ON entries FOR ALL
+-- Notes: users can only access their own
+CREATE POLICY "Users can CRUD own notes"
+  ON notes FOR ALL
   USING (auth.uid() = user_id);
 
--- Entry analyses: ditto
-CREATE POLICY "Users can CRUD own analyses"
-  ON entry_analyses FOR ALL
-  USING (auth.uid() = user_id);
-
--- Summaries: ditto
-CREATE POLICY "Users can CRUD own summaries"
-  ON summaries FOR ALL
+-- Insights: ditto
+CREATE POLICY "Users can CRUD own insights"
+  ON insights FOR ALL
   USING (auth.uid() = user_id);
 
 -- Themes: all authenticated users can read
@@ -146,12 +139,28 @@ CREATE POLICY "Anyone can read themes"
 
 | Route | Page |
 |-------|------|
-| `/` | Today's question + editor (landing) |
-| `/timeline` | Entry history (chronological + calendar) |
-| `/timeline/[id]` | Single entry detail with LLM analysis |
-| `/insights` | Analysis dashboard (Phase 3) |
-| `/themes` | Theme browser (Phase 2) |
-| `/settings` | Account + LLM provider config |
+| `/` | Landing page (hero, features, CTA) — 未認証ユーザー向け |
+| `/login` | ログイン / 新規登録 (email + password) |
+| `/auth/callback` | Supabase Auth コールバック |
+| `/app` | Today's question + editor (認証必須) |
+| `/app/explore` | ノート一覧 → Mirror対話へ進む |
+| `/app/explore/[id]` | Single entry detail + Mirror chat + 感情分析 |
+| `/app/timeline` | Entry history (chronological + 全文検索) |
+| `/app/timeline/[id]` | Single entry detail + 保存済みInsight表示 |
+
+### 認証状態による振り分け（ランディングページ）
+
+ランディングページ (`/`) のボタンはクリック時に `supabase.auth.getSession()` で認証状態を判定し、遷移先を振り分ける:
+
+| ボタン | 未ログイン時 | ログイン済み時 |
+|--------|-------------|---------------|
+| 「ログイン」（Nav / Hero内） | `/login` (ログインモード) | `/app` |
+| 「始める」（Nav） | `/login?mode=signup` (新規登録モード) | `/app` |
+| 「無料ではじめる」（Hero / 下部CTA） | `/login?mode=signup` (新規登録モード) | `/app` |
+
+- 自動リダイレクトは行わない。認証済みユーザーでもランディングページを閲覧できる。
+- ログインページは `?mode=signup` クエリパラメータで初期モードを切り替え可能。
+- 画面上の「ログイン/新規登録」トグルでいつでもモード変更可能。
 
 ## LLM Integration Architecture
 

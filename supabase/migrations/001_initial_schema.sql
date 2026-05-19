@@ -1,5 +1,5 @@
 -- Minamo (水面) — Initial Schema
-
+--
 -- ============================================
 -- TABLES
 -- ============================================
@@ -12,8 +12,8 @@ CREATE TABLE themes (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Journal entries
-CREATE TABLE entries (
+-- Journal notes
+CREATE TABLE notes (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   theme_id   TEXT,
@@ -25,7 +25,7 @@ CREATE TABLE entries (
 -- Deep-dive insights (result of LLM conversation)
 CREATE TABLE insights (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  entry_id   UUID NOT NULL REFERENCES entries(id) ON DELETE CASCADE,
+  note_id    UUID NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
   user_id    UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   dialogue   JSONB NOT NULL,
   insight    TEXT NOT NULL,
@@ -37,18 +37,18 @@ CREATE TABLE insights (
 -- FULL-TEXT SEARCH
 -- ============================================
 
-ALTER TABLE entries ADD COLUMN search_vector tsvector
+ALTER TABLE notes ADD COLUMN search_vector tsvector
   GENERATED ALWAYS AS (to_tsvector('simple', coalesce(content, ''))) STORED;
 
-CREATE INDEX entries_search_idx ON entries USING GIN(search_vector);
+CREATE INDEX notes_search_idx ON notes USING GIN(search_vector);
 
 -- ============================================
 -- INDEXES
 -- ============================================
 
-CREATE INDEX entries_user_id_idx ON entries(user_id);
-CREATE INDEX entries_created_at_idx ON entries(created_at DESC);
-CREATE INDEX insights_entry_id_idx ON insights(entry_id);
+CREATE INDEX notes_user_id_idx ON notes(user_id);
+CREATE INDEX notes_created_at_idx ON notes(created_at DESC);
+CREATE INDEX insights_note_id_idx ON insights(note_id);
 CREATE INDEX insights_user_id_idx ON insights(user_id);
 
 -- ============================================
@@ -56,7 +56,7 @@ CREATE INDEX insights_user_id_idx ON insights(user_id);
 -- ============================================
 
 ALTER TABLE themes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE entries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE insights ENABLE ROW LEVEL SECURITY;
 
 -- Themes: all authenticated users can read
@@ -65,21 +65,21 @@ CREATE POLICY "Anyone can read themes"
   TO authenticated
   USING (true);
 
--- Entries: users can CRUD own entries only
-CREATE POLICY "Users can read own entries"
-  ON entries FOR SELECT
+-- Notes: users can CRUD own notes only
+CREATE POLICY "Users can read own notes"
+  ON notes FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can insert own entries"
-  ON entries FOR INSERT
+CREATE POLICY "Users can insert own notes"
+  ON notes FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users can update own entries"
-  ON entries FOR UPDATE
+CREATE POLICY "Users can update own notes"
+  ON notes FOR UPDATE
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can delete own entries"
-  ON entries FOR DELETE
+CREATE POLICY "Users can delete own notes"
+  ON notes FOR DELETE
   USING (auth.uid() = user_id);
 
 -- Insights: users can CRUD own insights only
