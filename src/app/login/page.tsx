@@ -34,7 +34,7 @@ export default function LoginPage() {
             "このメールアドレスは既に登録されています。ログインしてください。"
           );
         } else if (data?.session) {
-          router.push("/");
+          router.push("/app");
           router.refresh();
         } else {
           setMessage(
@@ -50,7 +50,7 @@ export default function LoginPage() {
         if (signInError) {
           setError(signInError.message);
         } else {
-          router.push("/");
+          router.push("/app");
           router.refresh();
         }
       }

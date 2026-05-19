@@ -46,7 +46,7 @@ export default function TimelineList({ entries, insights }: Props) {
 
         return (
           <div key={entry.id} className="group">
-            <Link href={`/timeline/${entry.id}`} className="block">
+            <Link href={`/app/timeline/${entry.id}`} className="block">
               <article>
                 <time className="text-xs text-text-secondary/40 tracking-wide">
                   {dateStr} {timeStr}

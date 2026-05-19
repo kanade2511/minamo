@@ -54,7 +54,7 @@ export default async function ExplorePage() {
           return (
             <Link
               key={entry.id}
-              href={`/explore/${entry.id}`}
+              href={`/app/explore/${entry.id}`}
               className="block p-5 rounded-lg border border-border hover:border-accent/30 transition-colors bg-white"
             >
               <div className="flex items-start justify-between gap-4">
