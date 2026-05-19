@@ -1,0 +1,17 @@
+[
+  { "question": "今日、どんなことに心が動いた？", "category": "daily" },
+  { "question": "今週、自分の中で変わったことはある？", "category": "weekly" },
+  { "question": "最近、誰かの言葉で印象に残っているものは？", "category": "relationships" },
+  { "question": "今、自分が大切にしている価値観は？", "category": "values" },
+  { "question": "今日、難しかったことは？それをどう乗り越えた？", "category": "challenge" },
+  { "question": "今日、感謝していることは？", "category": "gratitude" },
+  { "question": "最近、自分を制限している考え方はある？", "category": "mindset" },
+  { "question": "今日の自分に、一言かけるとしたら？", "category": "self" },
+  { "question": "最近、無意識にやりがちな行動は？", "category": "patterns" },
+  { "question": "今、自分にとって「心地いい」ってどんな状態？", "category": "feelings" },
+  { "question": "今日、誰かの役に立てたことはある？", "category": "relationships" },
+  { "question": "最近、避けていることはある？それはなぜ？", "category": "challenge" },
+  { "question": "今の自分に足りないものより、既にあるものは何？", "category": "gratitude" },
+  { "question": "今日、どんなことにエネルギーを使った？", "category": "daily" },
+  { "question": "もし明日何も制約がなかったら、何をする？", "category": "values" }
+]
