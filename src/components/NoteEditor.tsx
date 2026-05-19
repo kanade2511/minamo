@@ -30,7 +30,14 @@ export default function NoteEditor({ question, userId }: Props) {
         if (!content.trim()) return
         setIsSaving(true)
         try {
-            const created = await createNote(content, mode === 'question' ? question.id : undefined)
+            const finalContent =
+                mode === 'question'
+                    ? `── ${question.question} ──\n\n${content}`
+                    : content
+            const created = await createNote(
+                finalContent,
+                mode === 'question' ? question.id : undefined,
+            )
             setSavedNote(created)
         } catch (e) {
             console.error('Save failed:', e)
