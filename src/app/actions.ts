@@ -21,8 +21,8 @@ export async function createEntry(content: string, themeId?: string) {
     .single();
 
   if (error) throw new Error(error.message);
-  revalidatePath("/");
-  revalidatePath("/timeline");
+  revalidatePath("/app");
+  revalidatePath("/app/timeline");
   return data;
 }
 
@@ -40,8 +40,8 @@ export async function updateEntry(id: string, content: string) {
     .single();
 
   if (error) throw new Error(error.message);
-  revalidatePath("/");
-  revalidatePath("/timeline");
+  revalidatePath("/app");
+  revalidatePath("/app/timeline");
   return data;
 }
 
@@ -57,8 +57,9 @@ export async function deleteEntry(id: string) {
     .eq("user_id", user.id);
 
   if (error) throw new Error(error.message);
-  revalidatePath("/");
-  revalidatePath("/timeline");
+  revalidatePath("/app");
+  revalidatePath("/app/timeline");
+  revalidatePath("/app/explore");
 }
 
 // ─── Insights ──────────────────────────────────────
@@ -86,6 +87,6 @@ export async function saveInsight(
     .single();
 
   if (error) throw new Error(error.message);
-  revalidatePath("/timeline");
+  revalidatePath("/app/timeline");
   return data;
 }

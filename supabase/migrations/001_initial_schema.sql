@@ -1,6 +1,4 @@
 -- Minamo (水面) — Initial Schema
--- Enable UUID generation
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================
 -- TABLES
@@ -8,7 +6,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Themes (questions/prompts for daily reflection)
 CREATE TABLE themes (
-  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   question   TEXT NOT NULL,
   category   TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
@@ -16,9 +14,9 @@ CREATE TABLE themes (
 
 -- Journal entries
 CREATE TABLE entries (
-  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  theme_id   UUID REFERENCES themes(id) ON DELETE SET NULL,
+  theme_id   TEXT,
   content    TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -26,7 +24,7 @@ CREATE TABLE entries (
 
 -- Deep-dive insights (result of LLM conversation)
 CREATE TABLE insights (
-  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   entry_id   UUID NOT NULL REFERENCES entries(id) ON DELETE CASCADE,
   user_id    UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   dialogue   JSONB NOT NULL,

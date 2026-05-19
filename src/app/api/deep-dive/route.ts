@@ -36,16 +36,6 @@ export async function POST(request: NextRequest) {
 
   const allMessages = [systemMsg, entryMsg, ...history];
 
-  // Determine if we should synthesize (after ~3 exchanges)
-  const assistantCount = history.filter((m) => m.role === "assistant").length;
-  if (assistantCount >= 3) {
-    allMessages.push({
-      role: "user",
-      content:
-        "ここまでの対話を踏まえて、【対話の振り返り】と【あなた自身への問い】の形式で洞察を提示してください。",
-    });
-  }
-
   const provider = createOpenAIProvider({
     apiKey: process.env.LLM_API_KEY!,
     baseUrl: process.env.LLM_BASE_URL || "https://api.openai.com/v1",

@@ -1,10 +1,11 @@
 import Link from "next/link";
 import type { Entry, Insight } from "@/types/database";
 import InsightCard from "./InsightCard";
+import DeleteEntryButton from "./DeleteEntryButton";
 
 type Props = {
-  entries: (Entry & { themes: { question: string } | null })[];
-  insights: Record<string, Insight[]>; // keyed by entry_id
+  entries: Entry[];
+  insights: Record<string, Insight[]>;
 };
 
 export default function TimelineList({ entries, insights }: Props) {
@@ -44,42 +45,31 @@ export default function TimelineList({ entries, insights }: Props) {
             : entry.content;
 
         return (
-          <Link
-            key={entry.id}
-            href={`/timeline/${entry.id}`}
-            className="block group"
-          >
-            <article>
-              {/* Date */}
-              <time className="text-xs text-text-secondary/40 tracking-wide">
-                {dateStr} {timeStr}
-              </time>
-
-              {/* Question */}
-              {entry.themes?.question && (
-                <p className="text-xs text-text-secondary/50 mt-1 italic">
-                  {entry.themes.question}
+          <div key={entry.id} className="group">
+            <Link href={`/timeline/${entry.id}`} className="block">
+              <article>
+                <time className="text-xs text-text-secondary/40 tracking-wide">
+                  {dateStr} {timeStr}
+                </time>
+                <p className="mt-2 text-sm text-text-primary leading-relaxed whitespace-pre-wrap group-hover:text-text-secondary transition-colors">
+                  {preview}
                 </p>
-              )}
-
-              {/* Preview */}
-              <p className="mt-2 text-sm text-text-primary leading-relaxed whitespace-pre-wrap group-hover:text-text-secondary transition-colors">
-                {preview}
-              </p>
-
-              {/* Insights attached to this entry */}
-              {entryInsights.length > 0 && (
-                <div className="mt-2">
-                  <InsightCard insight={entryInsights[0]} />
-                  {entryInsights.length > 1 && (
-                    <p className="text-xs text-text-secondary/30 mt-1">
-                      +{entryInsights.length - 1} 件の気づき
-                    </p>
-                  )}
-                </div>
-              )}
-            </article>
-          </Link>
+                {entryInsights.length > 0 && (
+                  <div className="mt-2">
+                    <InsightCard insight={entryInsights[0]} />
+                    {entryInsights.length > 1 && (
+                      <p className="text-xs text-text-secondary/30 mt-1">
+                        +{entryInsights.length - 1} 件の気づき
+                      </p>
+                    )}
+                  </div>
+                )}
+              </article>
+            </Link>
+            <div className="mt-1 flex justify-end">
+              <DeleteEntryButton entryId={entry.id} />
+            </div>
+          </div>
         );
       })}
     </div>

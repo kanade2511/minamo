@@ -13,7 +13,7 @@ export default function InsightCard({ insight }: { insight: Insight }) {
           {insight.tags.map((tag, i) => (
             <span
               key={i}
-              className="text-[10px] px-2 py-0.5 bg-border/30 text-text-secondary/60"
+              className="text-[10px] px-2 py-0.5 bg-accent/10 text-accent/60"
             >
               {tag}
             </span>

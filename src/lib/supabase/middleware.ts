@@ -26,22 +26,31 @@ export async function updateSession(request: NextRequest) {
   );
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const user = session?.user;
 
   const isLoginPage = request.nextUrl.pathname === "/login";
   const isAuthCallback = request.nextUrl.pathname.startsWith("/auth");
-  const isPublicPath = isLoginPage || isAuthCallback;
+  const isPublicPath = isLoginPage || isAuthCallback || request.nextUrl.pathname === "/";
 
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
+
+  // Authenticated users on landing page → go to app
+  if (user && (request.nextUrl.pathname === "/" || request.nextUrl.pathname === "")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/app";
     return NextResponse.redirect(url);
   }
 
   if (user && isLoginPage) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/app";
     return NextResponse.redirect(url);
   }
 
