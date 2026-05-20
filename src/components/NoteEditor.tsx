@@ -4,13 +4,15 @@ import { useEffect, useRef, useState } from 'react'
 import { createNote } from '@/app/actions'
 import { createClient } from '@/lib/supabase/client'
 import NoteAnalysis from './NoteAnalysis'
+import WritingCalendar from './WritingCalendar'
 
 type Props = {
     question: { id: string; question: string; category: string }
     userId: string
+    notesByDate?: Record<string, number>
 }
 
-export default function NoteEditor({ question, userId }: Props) {
+export default function NoteEditor({ question, userId, notesByDate }: Props) {
     const [content, setContent] = useState('')
     const [mode, setMode] = useState<'question' | 'free' | null>(null)
     const [savedNote, setSavedNote] = useState<any>(null)
@@ -68,6 +70,12 @@ export default function NoteEditor({ question, userId }: Props) {
                         <h1 className='text-2xl font-light text-text-primary mb-2'>Minamo</h1>
                         <p className='text-text-secondary text-sm'>{today}</p>
                     </div>
+
+                    {notesByDate && (
+                        <div className='mb-6 -mx-2'>
+                            <WritingCalendar notesByDate={notesByDate} compact />
+                        </div>
+                    )}
 
                     <div className='space-y-3'>
                         <button

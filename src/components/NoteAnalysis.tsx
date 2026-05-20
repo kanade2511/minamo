@@ -9,14 +9,32 @@ type AnalysisResult = {
     summary: string
 }
 
-export default function NoteAnalysis({ content }: { content: string }) {
-    const [result, setResult] = useState<AnalysisResult | null>(null)
+export default function NoteAnalysis({
+    content,
+    savedResult,
+}: {
+    content?: string
+    savedResult?: AnalysisResult | null
+}) {
+    const [result, setResult] = useState<AnalysisResult | null>(savedResult ?? null)
     const [loading, setLoading] = useState(false)
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const lastAnalyzedRef = useRef('')
 
+    // If savedResult is provided, use it directly (readonly mode)
     useEffect(() => {
-        if (!content.trim()) {
+        if (savedResult) {
+            setResult(savedResult)
+            setLoading(false)
+            return
+        }
+    }, [savedResult])
+
+    // Real-time analysis mode (used in editor)
+    useEffect(() => {
+        // If we have a saved result, skip real-time fetching
+        if (savedResult) return
+        if (!content || !content.trim()) {
             setResult(null)
             return
         }
@@ -49,9 +67,11 @@ export default function NoteAnalysis({ content }: { content: string }) {
         return () => {
             if (timerRef.current) clearTimeout(timerRef.current)
         }
-    }, [content])
+    }, [content, savedResult])
 
-    if (!content.trim()) {
+    const displayContent = content ?? ''
+
+    if (!displayContent.trim() && !result) {
         return (
             <div className='text-center py-8'>
                 <p className='text-xs text-text-secondary/30'>ノートを書くと分析が表示されます</p>

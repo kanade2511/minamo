@@ -1,7 +1,9 @@
 import { notFound, redirect } from 'next/navigation'
 import DeleteNoteButton from '@/components/DeleteNoteButton'
 import InsightCard from '@/components/InsightCard'
+import NoteAnalysis from '@/components/NoteAnalysis'
 import { createClient } from '@/lib/supabase/server'
+import { getAnalysisForNote } from '@/app/actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,6 +33,9 @@ export default async function NoteDetailPage({ params }: { params: Promise<{ id:
         .select('*')
         .eq('note_id', id)
         .order('created_at', { ascending: true })
+
+    // Fetch saved analysis
+    const analysis = await getAnalysisForNote(id)
 
     const date = new Date(note.created_at)
     const dateStr = date.toLocaleDateString('ja-JP', {
@@ -63,6 +68,18 @@ export default async function NoteDetailPage({ params }: { params: Promise<{ id:
             <div className='mt-6 text-text-primary text-[1.05rem] leading-[1.9] whitespace-pre-wrap'>
                 {note.content}
             </div>
+
+            {/* Analysis */}
+            {analysis && (
+                <div className='mt-10'>
+                    <div className='rounded-lg border border-border p-5'>
+                        <h2 className='text-[10px] text-text-secondary/40 tracking-wider mb-4'>
+                            ノート分析
+                        </h2>
+                        <NoteAnalysis savedResult={analysis as any} />
+                    </div>
+                </div>
+            )}
 
             {/* Delete */}
             <div className='mt-4 flex justify-end'>

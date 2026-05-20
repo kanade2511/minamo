@@ -53,10 +53,9 @@ export default function LandingPage() {
                             <p className='text-xs text-text-secondary tracking-[0.15em] mb-6'>
                                 水面 — Minamo
                             </p>
-                            <h1 className='text-5xl md:text-7xl font-light text-text-primary leading-[1.0] tracking-[-1.5px] md:tracking-[-2px]'>
-                                自分のことを
-                                <br />
-                                もっと知っていく。
+                            <h1 className='text-4xl sm:text-5xl lg:text-6xl font-light text-text-primary leading-[1.1] tracking-[-1px] sm:tracking-[-1.5px] md:tracking-[-2px]'>
+                                <span className='block'>自分のことを</span>
+                                <span className='block'>もっと知っていく。</span>
                             </h1>
                             <p className='mt-8 text-lg text-text-secondary leading-relaxed max-w-lg'>
                                 Minamoは、日々の問いかけに答えながら自分自身の思考や感情のパターンをやさしく紐解いていく内省ツールです。

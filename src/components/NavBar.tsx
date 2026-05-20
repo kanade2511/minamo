@@ -28,7 +28,7 @@ export default function NavBar() {
     // Close menu on navigation
     useEffect(() => {
         setMenuOpen(false)
-    }, [])
+    }, [pathname])
 
     // Close menu on Escape
     useEffect(() => {
@@ -62,6 +62,7 @@ export default function NavBar() {
 
     const navLinks = [
         { href: '/app', label: '書く' },
+        { href: '/app/insights', label: 'インサイト' },
         { href: '/app/explore', label: '探る' },
         { href: '/app/timeline', label: 'タイムライン' },
     ]

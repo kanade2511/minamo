@@ -4,13 +4,13 @@
 
 ## Overview
 
-Minamo is a guided self-reflection journal with AI-powered analysis. 
-Users respond to daily prompts, building a personal archive of thoughts over time. 
-LLM processes each entry to extract emotions, themes, and patterns, 
+Minamo is a guided self-reflection journal with AI-powered analysis.
+Users respond to daily prompts, building a personal archive of thoughts over time.
+LLM processes each note to extract emotions, themes, and patterns,
 surfacing insights the user couldn't see on their own.
 
-The name **水面 (Minamo)** — "water surface" — evokes reflection, stillness, 
-and the ripples of daily thought. Like a still pond, the app reflects the user's 
+The name **水面 (Minamo)** — "water surface" — evokes reflection, stillness,
+and the ripples of daily thought. Like a still pond, the app reflects the user's
 inner self back to them.
 
 ## Design Philosophy: "静かな水面"
@@ -19,8 +19,8 @@ Inspired by Nordic minimalism and modernist functional beauty:
 
 - **Silence** — no unnecessary UI elements. Writing is the only focus.
 - **Whitespace as language** — generous margins, airy layouts, like a high-quality notebook.
-- **Typography first** — the written word is the hero. Clean sans-serif or warm serif.
-- **Monochrome + 1 accent** — off-white base, dark text, one calm accent color (ink blue or charcoal).
+- **Typography first** — the written word is the hero. Clean sans-serif (Geist).
+- **Monochrome + 1 accent** — white base, dark text (#17171c), steel blue accent (#4a6fa5).
 - **No decorative noise** — no gradients, no heavy shadows, no animations that don't serve the content.
 - **Responsive but desktop-first** — writing on a big canvas feels better.
 
@@ -29,55 +29,46 @@ Inspired by Nordic minimalism and modernist functional beauty:
 ```
 毎日:
   ┌─────────────────────────────────────────┐
-  │  今日の問い                              │
-  │  "今日、どんなことに心が動いた？"          │
-  │                                         │
+  │  今日の問い  or  自由記述                 │
   │  ┌─────────────────────────────────────┐ │
-  │  │                                     │ │
-  │  │  (自由記述エリア — 静かな白い余白)    │ │
-  │  │                                     │ │
+  │  │  (エディタ — 静かな白い余白)          │ │
+  │  │                                      │ │
   │  └─────────────────────────────────────┘ │
   │                                         │
-  │  [ 保存 ]                                │
+  │  [ 保存 ] → 自動LLM分析 → DB保存         │
   └─────────────────────────────────────────┘
-          ↓ (バックグラウンド)
-  LLM分析:
-    • 感情を抽出 → タグ化
-    • テーマを抽出 → カテゴリ化
-    • エンベディング生成 → ベクトルDB保存
           ↓ (蓄積)
-  週末 / 月末:
-    LLMが期間内の全エントリを横断
-    → 「今週のあなた」サマリー
-    → 思考パターン・感情の推移
-    → 気づき・発見
+  インサイトページ:
+    • 執筆アクティビティカレンダー（直近14日）
+    • ムードトレンド（週間/月間の感情推移グラフ）
+          ↓
+  Mirrorとの対話（「探る」タブ）:
+    • 保存したノートを題材にAIが深掘り対話
+    • 対話内容は insights テーブルに保存可能
 ```
 
 ## Tech Stack
 
 | Layer | Choice |
 |-------|--------|
-| Framework | Next.js (TypeScript) |
+| Framework | Next.js 16 (TypeScript, Turbopack) |
 | Database | Supabase (Postgres) |
-| Vector DB | pgvector (on Supabase, no extra infra) |
-| Auth | Supabase Auth (Magic Link) |
-| LLM API | Abstracted (configurable provider; default TBD) |
-| Embedding | text-embedding-3-small (or equiv.) |
-| Styling | Tailwind CSS |
+| Auth | Supabase Auth (email + password) |
+| LLM API | OpenRouter (configurable via env) |
+| Styling | Tailwind CSS v4 |
+| Analysis | Biome (linter + formatter) |
+| Analytics | Vercel Analytics |
 | Deploy | Vercel |
 
 ## Data Model
 
 ```sql
--- Enable pgvector
-CREATE EXTENSION IF NOT EXISTS vector;
-
 -- Themes (questions/prompts for daily reflection)
+-- NOTE: Currently loaded from seed/questions.json, not from this table
 CREATE TABLE themes (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   question   TEXT NOT NULL,
   category   TEXT,
-  created_by UUID REFERENCES auth.users(id),
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -85,16 +76,21 @@ CREATE TABLE themes (
 CREATE TABLE notes (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    UUID REFERENCES auth.users(id) NOT NULL,
-  theme_id   UUID REFERENCES themes(id),
+  theme_id   TEXT,
   content    TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Deep-dive insights (result of LLM conversation)
+-- Full-text search vector (auto-generated from content)
+ALTER TABLE notes ADD COLUMN search_vector tsvector
+  GENERATED ALWAYS AS (to_tsvector('simple', coalesce(content, ''))) STORED;
+CREATE INDEX notes_search_idx ON notes USING GIN(search_vector);
+
+-- Deep-dive insights (result of Mirror conversation)
 CREATE TABLE insights (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  note_id    UUID REFERENCES notes(id) ON DELETE CASCADE,
+  note_id    UUID NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
   user_id    UUID REFERENCES auth.users(id) NOT NULL,
   dialogue   JSONB NOT NULL,
   insight    TEXT NOT NULL,
@@ -102,16 +98,16 @@ CREATE TABLE insights (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Periodic summaries (weekly / monthly)
-CREATE TABLE summaries (
-  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id      UUID REFERENCES auth.users(id) NOT NULL,
-  period       TEXT NOT NULL CHECK (period IN ('weekly', 'monthly')),
-  period_start DATE NOT NULL,
-  period_end   DATE NOT NULL,
-  content      TEXT NOT NULL,
-  insights     TEXT[],
-  created_at   TIMESTAMPTZ DEFAULT now()
+-- LLM analysis results (auto-saved on note creation)
+CREATE TABLE note_analyses (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  note_id    UUID NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+  user_id    UUID REFERENCES auth.users(id) NOT NULL,
+  emotions   JSONB NOT NULL,
+  sentiment  TEXT NOT NULL CHECK (sentiment IN ('positive', 'neutral', 'negative')),
+  keywords   TEXT[],
+  summary    TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
 );
 ```
 
@@ -119,20 +115,34 @@ CREATE TABLE summaries (
 
 ```sql
 -- Notes: users can only access their own
-CREATE POLICY "Users can CRUD own notes"
-  ON notes FOR ALL
-  USING (auth.uid() = user_id);
+CREATE POLICY "Users can read own notes"
+  ON notes FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own notes"
+  ON notes FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own notes"
+  ON notes FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own notes"
+  ON notes FOR DELETE USING (auth.uid() = user_id);
 
 -- Insights: ditto
-CREATE POLICY "Users can CRUD own insights"
-  ON insights FOR ALL
-  USING (auth.uid() = user_id);
+CREATE POLICY "Users can read own insights"
+  ON insights FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own insights"
+  ON insights FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own insights"
+  ON insights FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own insights"
+  ON insights FOR DELETE USING (auth.uid() = user_id);
+
+-- Note analyses: ditto
+CREATE POLICY "Users can read own note_analyses"
+  ON note_analyses FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own note_analyses"
+  ON note_analyses FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Themes: all authenticated users can read
 CREATE POLICY "Anyone can read themes"
-  ON themes FOR SELECT
-  TO authenticated
-  USING (true);
+  ON themes FOR SELECT TO authenticated USING (true);
 ```
 
 ## Page Structure
@@ -140,13 +150,17 @@ CREATE POLICY "Anyone can read themes"
 | Route | Page |
 |-------|------|
 | `/` | Landing page (hero, features, CTA) — 未認証ユーザー向け |
-| `/login` | ログイン / 新規登録 (email + password) |
+| `/login` | ログイン / 新規登録 (email + password + `?mode=signup`) |
 | `/auth/callback` | Supabase Auth コールバック |
-| `/app` | Today's question + editor (認証必須) |
+| `/app` | Today's question / free editor + 執筆アクティビティカレンダー |
 | `/app/explore` | ノート一覧 → Mirror対話へ進む |
-| `/app/explore/[id]` | Single entry detail + Mirror chat + 感情分析 |
-| `/app/timeline` | Entry history (chronological + 全文検索) |
-| `/app/timeline/[id]` | Single entry detail + 保存済みInsight表示 |
+| `/app/explore/[id]` | ノート詳細 + Mirror対話 + ノート分析 |
+| `/app/timeline` | 全ノート一覧 (chronological + 全文検索) |
+| `/app/timeline/[id]` | ノート詳細 + 保存済みInsight表示 + 分析結果 |
+| `/app/insights` | 執筆アクティビティカレンダー + ムードトレンド |
+| `/api/analyze` | LLM感情分析API (POST) |
+| `/api/deep-dive` | Mirror対話API (POST, streaming) |
+| `/api/export` | 全データJSONエクスポート (GET) |
 
 ### 認証状態による振り分け（ランディングページ）
 
@@ -165,45 +179,47 @@ CREATE POLICY "Anyone can read themes"
 ## LLM Integration Architecture
 
 ```
-[Client] → Server Action → [Next.js]
+[Client] → Server Action / API Route → [Next.js]
                               │
                     ┌─────────┴──────────┐
                     ▼                      ▼
-            Supabase (save entry)    LLM API (analyze)
+            Supabase (save note)     OpenRouter (analyze / deep-dive)
                                          │
                               ┌──────────┴──────────┐
                               ▼                      ▼
-                        entry_analyses           pgvector
-                        (emotions, themes,       (embeddings
-                         summary, keywords)       for search)
+                        note_analyses           Mirror conversation
+                        (emotions,              (streaming response
+                         sentiment,              → insights table)
+                         keywords, summary)
 ```
 
-- **Sync or background?** Fire-and-forget on entry save. User doesn't wait for LLM.
-- **Provider abstraction:** Interface with swapable implementation (OpenAI, Anthropic, local).
-- **Vector search:** Similar entries by cosine similarity on embeddings.
+- **Analysis:** Fire-and-forget on note save. `createNote()` calls `analyzeText()` and saves result to `note_analyses`. Non-blocking on failure.
+- **Mirror:** Streaming conversation via `/api/deep-dive`. User can save the dialogue as an insight.
+- **Provider:** OpenRouter with configurable model via `LLM_MODEL` env var.
+- **No embeddings / vector search** — currently not implemented (future Phase 3).
 
 ## Development Phases
 
-### Phase 1 — Core Loop
-1. Project scaffolding (Next.js + Tailwind + Supabase)
-2. Database schema + RLS (themes, entries)
-3. Minamo Auth (Magic Link)
-4. Today's question page + editor
-5. Timeline view
-6. LLM analysis pipeline (background after entry save)
-7. Seed themes
+### Phase 1 — Core Loop ✅ (Complete)
+1. ✅ Project scaffolding (Next.js + Tailwind + Supabase)
+2. ✅ Database schema + RLS (themes, notes, insights)
+3. ✅ Auth (email + password)
+4. ✅ Today's question page + editor
+5. ✅ Timeline view + full-text search
+6. ✅ LLM analysis pipeline (auto on note save, persisted to DB)
+7. ✅ Seed questions (50 questions in seed/questions.json)
 
-### Phase 2 — Depth
-8. Theme management CRUD
-9. Mood/emotion tagging
-10. Search & filter
-11. Entry detail with LLM analysis display
+### Phase 2 — Depth ✅ (Mostly Complete)
+8. ❌ Theme management CRUD — questions are hardcoded in seed JSON
+9. ✅ Mood/emotion analysis (real-time editor + auto-save)
+10. ✅ Search & filter (full-text search on timeline)
+11. ✅ Note detail with LLM analysis display (timeline detail + explore)
 
-### Phase 3 — Insights
-12. Weekly/monthly summary generation
-13. Insights dashboard (emotion trends, theme frequency)
-14. Semantic search ("How have I felt about X?")
-15. Question-answering over past entries (RAG)
+### Phase 3 — Insights 🟡 (Partially Complete)
+12. ❌ Weekly/monthly summary generation
+13. ✅ Insights dashboard (mood trend chart) — `/app/insights`
+14. ❌ Semantic search / vector embeddings
+15. ❌ Question-answering over past notes (RAG)
 
 ## Name Origin
 
@@ -215,4 +231,4 @@ CREATE POLICY "Anyone can read themes"
 
 ---
 
-*Design Concept v1.0 — May 2026*
+*Design Concept v2.0 — May 2026*
