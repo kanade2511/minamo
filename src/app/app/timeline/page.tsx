@@ -61,13 +61,6 @@ export default async function TimelinePage({
         <div className='max-w-2xl mx-auto px-6 py-12'>
             <div className='flex items-center justify-between mb-8'>
                 <h1 className='text-lg font-light text-text-primary'>タイムライン</h1>
-                <a
-                    href='/api/export'
-                    className='text-xs text-text-secondary/40 hover:text-text-secondary transition-colors'
-                    download
-                >
-                    データを書き出す
-                </a>
             </div>
 
             <TimelineSearch initialQuery={q} />

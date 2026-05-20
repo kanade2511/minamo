@@ -30,7 +30,7 @@ export default async function ExplorePage() {
                 <div className='text-center py-20'>
                     <p className='text-text-secondary/40 text-sm'>まだノートがありません。</p>
                     <Link
-                        href='/'
+                        href='/app'
                         className='inline-block mt-4 text-sm text-accent underline underline-offset-2'
                     >
                         最初のノートを書く

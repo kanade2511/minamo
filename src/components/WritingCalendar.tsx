@@ -62,26 +62,31 @@ export default function WritingCalendar({ notesByDate, compact }: Props) {
     }, [notesByDate, today])
 
     const getColor = (count: number): string => {
-        if (count === 0) return 'bg-transparent'
+        if (count === 0) return 'bg-border/20'
         if (count === 1) return 'bg-accent/20'
         if (count === 2) return 'bg-accent/50'
         return 'bg-accent'
     }
 
     const cellSize = compact ? 28 : 32
+    const dotSize = compact ? 24 : 28
 
     return (
-        <div>
-            <div className='flex gap-1.5'>
+        <div className='w-full'>
+            <div className='flex w-full justify-between items-end'>
                 {cells.map(cell => (
                     <div key={cell.date} className='flex flex-col items-center gap-1'>
-                        <span className='text-[10px] text-text-muted leading-none'>
+                        <span className='text-[8px] text-text-muted leading-none'>
                             {cell.label}
                         </span>
                         <div
-                            className={`relative ${getColor(cell.count)} rounded-md ${cell.isToday ? 'ring-1 ring-accent ring-offset-[1px] ring-offset-bg-primary' : ''} ${cell.count > 0 ? 'group' : ''}`}
+                            className={`relative flex items-center justify-center ${cell.isToday ? 'ring-1 ring-accent ring-offset-[1px] ring-offset-bg-primary' : ''} rounded-full ${cell.count > 0 ? 'group' : ''}`}
                             style={{ width: cellSize, height: cellSize }}
                         >
+                            <div
+                                className={`rounded-full ${getColor(cell.count)}`}
+                                style={{ width: dotSize, height: dotSize }}
+                            />
                             {cell.count > 0 && (
                                 <div className='pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10'>
                                     <div className='bg-text-primary text-bg-primary text-[10px] px-2 py-1 rounded whitespace-nowrap shadow-sm'>

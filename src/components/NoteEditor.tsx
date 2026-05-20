@@ -142,7 +142,7 @@ export default function NoteEditor({ question, userId, notesByDate }: Props) {
                         <button
                             onClick={handleSave}
                             disabled={isSaving || !content.trim()}
-                            className='px-6 py-2.5 bg-text-primary text-bg-primary text-sm rounded-full disabled:opacity-30 hover:opacity-90 transition-opacity'
+                            className='px-6 py-2.5 bg-accent text-white text-sm rounded-full disabled:opacity-30 hover:opacity-90 transition-opacity'
                         >
                             {isSaving ? '保存中...' : '保存'}
                         </button>

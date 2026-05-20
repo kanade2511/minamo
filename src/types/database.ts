@@ -32,3 +32,12 @@ export type NoteAnalysis = {
     summary: string
     created_at: string
 }
+
+export type Summary = {
+    id: string
+    user_id: string
+    week_start: string
+    week_end: string
+    content: string
+    created_at: string
+}

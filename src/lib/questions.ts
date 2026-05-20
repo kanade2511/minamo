@@ -1,4 +1,4 @@
-import questions from '../../seed/questions.json'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 type Question = {
     question: string
@@ -6,13 +6,31 @@ type Question = {
 }
 
 /**
- * Returns today's question deterministically based on date + userId hash.
+ * Returns today's question deterministically based on date + userId hash,
+ * fetched from the Supabase themes table.
  */
-export function getDailyQuestion(userId: string): Question & { id: string } {
+export async function getDailyQuestion(
+    userId: string,
+    supabase: SupabaseClient,
+): Promise<Question & { id: string }> {
+    const { data: questions, error } = await supabase
+        .from('themes')
+        .select('id, question, category')
+
+    if (error || !questions || questions.length === 0) {
+        console.error('Failed to fetch questions from Supabase:', error?.message)
+        // Fallback: return a hardcoded question if DB is empty
+        return {
+            id: 'fallback-0',
+            question: '今日、どんなことに心が動いた？',
+            category: 'daily',
+        }
+    }
+
     const today = new Date().toISOString().split('T')[0]
     const seed = hashCode(today + userId)
     const index = Math.abs(seed) % questions.length
-    return { ...questions[index], id: `seed-${index}` }
+    return questions[index]
 }
 
 function hashCode(str: string): number {

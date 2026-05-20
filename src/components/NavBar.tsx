@@ -10,20 +10,54 @@ export default function NavBar() {
     const router = useRouter()
     const pathname = usePathname()
     const [email, setEmail] = useState<string | null>(null)
+    const [displayName, setDisplayName] = useState<string | null>(null)
     const [menuOpen, setMenuOpen] = useState(false)
     const overlayRef = useRef<HTMLDivElement>(null)
 
     const isPublicPage = pathname === '/login' || pathname.startsWith('/auth') || pathname === '/'
+
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
 
     useEffect(() => {
         const getUser = async () => {
             const {
                 data: { user },
             } = await supabase.auth.getUser()
-            if (user) setEmail(user.email ?? null)
+            if (user) {
+                setEmail(user.email ?? null)
+                setDisplayName(user.user_metadata?.display_name ?? null)
+                setAvatarUrl(user.user_metadata?.avatar_url ?? null)
+            }
         }
         getUser()
     }, [supabase.auth.getUser])
+
+    // Listen for auth state changes (avatar upload, theme change, etc.)
+    useEffect(() => {
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (session?.user) {
+                setEmail(session.user.email ?? null)
+                setDisplayName(session.user.user_metadata?.display_name ?? null)
+                setAvatarUrl(session.user.user_metadata?.avatar_url ?? null)
+            }
+        })
+        return () => subscription.unsubscribe()
+    }, [supabase])
+
+    // Re-fetch user data when settings save (custom event from settings page)
+    useEffect(() => {
+        const handler = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (user) {
+                setDisplayName(user.user_metadata?.display_name ?? null)
+                setAvatarUrl(user.user_metadata?.avatar_url ?? null)
+            }
+        }
+        window.addEventListener('user-updated', handler)
+        return () => window.removeEventListener('user-updated', handler)
+    }, [supabase])
 
     // Close menu on navigation
     useEffect(() => {
@@ -74,19 +108,19 @@ export default function NavBar() {
 
     const linkClass = (active: boolean) =>
         `text-sm transition-colors ${
-            active ? 'text-text-primary font-medium' : 'text-text-secondary hover:text-text-primary'
+            active ? 'text-accent font-medium' : 'text-text-secondary hover:text-text-primary'
         }`
 
     const menuLinkClass = (active: boolean) =>
         `block w-full py-4 text-xl tracking-tight text-center transition-colors ${
-            active ? 'text-text-primary font-medium' : 'text-text-secondary hover:text-text-primary'
+            active ? 'text-accent font-medium' : 'text-text-secondary hover:text-text-primary'
         }`
 
     return (
         <>
             <header className='sticky top-0 z-40 bg-bg-primary/80 backdrop-blur-sm border-b border-border'>
                 <div className='max-w-6xl mx-auto px-6 h-14 flex items-center justify-between'>
-                    <Link href='/app' className='text-sm text-text-primary tracking-tight font-medium'>
+                    <Link href='/app' className='text-base tracking-tight font-semibold'>
                         Minamo
                     </Link>
 
@@ -103,16 +137,38 @@ export default function NavBar() {
                         ))}
                         <div className='h-4 w-px bg-border' />
                         {email && (
-                            <span className='text-xs text-text-muted'>
-                                {email.length > 24 ? `${email.slice(0, 24)}…` : email}
-                            </span>
+                            <div className='relative group'>
+                                {avatarUrl ? (
+                                    <img
+                                        src={avatarUrl}
+                                        alt=''
+                                        className='w-7 h-7 rounded-full object-cover'
+                                    />
+                                ) : (
+                                    <button className='w-7 h-7 rounded-full bg-accent text-bg-primary text-xs font-medium flex items-center justify-center hover:opacity-90 transition-opacity'>
+                                        {displayName ? displayName[0].toUpperCase() : email[0].toUpperCase()}
+                                    </button>
+                                )}
+                                <div className='absolute right-0 top-full mt-2 w-48 bg-surface-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50'>
+                                    <div className='px-4 py-3 border-b border-border'>
+                                        <p className='text-xs text-text-primary font-medium truncate'>{displayName || email}</p>
+                                        <p className='text-[10px] text-text-muted truncate mt-0.5'>{email}</p>
+                                    </div>
+                                    <Link
+                                        href='/app/settings'
+                                        className='block px-4 py-2.5 text-xs text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-colors'
+                                    >
+                                        アカウント設定
+                                    </Link>
+                                    <button
+                                        onClick={handleLogout}
+                                        className='w-full text-left px-4 py-2.5 text-xs text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-colors rounded-b-lg border-t border-border'
+                                    >
+                                        ログアウト
+                                    </button>
+                                </div>
+                            </div>
                         )}
-                        <button
-                            onClick={handleLogout}
-                            className='text-xs text-text-muted hover:text-text-primary transition-colors'
-                        >
-                            ログアウト
-                        </button>
                     </nav>
 
                     {/* Hamburger button (mobile) */}
@@ -159,6 +215,7 @@ export default function NavBar() {
                             </Link>
                         ))}
 
+                        {/* Divider between nav links and account */}
                         <div
                             className='w-8 h-px bg-border-strong my-5'
                             style={{
@@ -168,30 +225,40 @@ export default function NavBar() {
                             }}
                         />
 
+                        {/* Account section */}
                         {email && (
                             <div
-                                className='text-xs text-text-muted py-2 text-center'
+                                className='w-full pt-6'
                                 style={{
                                     animation: `nav-item-in 0.35s ease-out forwards`,
-                                    animationDelay: `${(navLinks.length + 1) * 0.07}s`,
+                                    animationDelay: `${navLinks.length * 0.07}s`,
                                     opacity: 0,
                                 }}
                             >
-                                {email}
+                                <div className='flex items-center gap-3 mb-3'>
+                                <div className='w-8 h-8 rounded-full bg-accent text-bg-primary text-sm font-medium flex items-center justify-center flex-shrink-0 overflow-hidden'>
+                                        {avatarUrl ? (
+                                            <img src={avatarUrl} alt='' className='w-full h-full object-cover' />
+                                        ) : (
+                                            email[0].toUpperCase()
+                                        )}
+                                    </div>
+                                    <span className='text-sm text-text-primary truncate'>{displayName || email}</span>
+                                </div>
+                                <Link
+                                    href='/app/settings'
+                                    className='block w-full text-center py-2.5 text-xs text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-secondary'
+                                >
+                                    アカウント設定
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className='w-full text-center py-2.5 text-xs text-text-muted hover:text-text-primary transition-colors rounded-lg hover:bg-bg-secondary'
+                                >
+                                    ログアウト
+                                </button>
                             </div>
                         )}
-
-                        <button
-                            onClick={handleLogout}
-                            className='text-xs text-text-muted hover:text-text-primary transition-colors py-2 text-center'
-                            style={{
-                                animation: `nav-item-in 0.35s ease-out forwards`,
-                                animationDelay: `${(navLinks.length + (email ? 2 : 1)) * 0.07}s`,
-                                opacity: 0,
-                            }}
-                        >
-                            ログアウト
-                        </button>
                     </nav>
                 </div>
             )}

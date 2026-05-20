@@ -25,3 +25,29 @@ export async function createClient() {
         },
     )
 }
+
+/** Admin client for privileged operations (auth user deletion, etc.) */
+export async function createAdminClient() {
+    const cookieStore = await cookies()
+
+    return createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+            cookies: {
+                getAll() {
+                    return cookieStore.getAll()
+                },
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value, options }) => {
+                        try {
+                            cookieStore.set(name, value, options)
+                        } catch {
+                            // ignore
+                        }
+                    })
+                },
+            },
+        },
+    )
+}

@@ -202,24 +202,54 @@ CREATE POLICY "Anyone can read themes"
 
 ### Phase 1 — Core Loop ✅ (Complete)
 1. ✅ Project scaffolding (Next.js + Tailwind + Supabase)
-2. ✅ Database schema + RLS (themes, notes, insights)
-3. ✅ Auth (email + password)
+2. ✅ Database schema + RLS (themes, notes, insights, summaries)
+3. ✅ Auth (email + password + magic link)
 4. ✅ Today's question page + editor
 5. ✅ Timeline view + full-text search
 6. ✅ LLM analysis pipeline (auto on note save, persisted to DB)
 7. ✅ Seed questions (50 questions in seed/questions.json)
 
-### Phase 2 — Depth ✅ (Mostly Complete)
-8. ❌ Theme management CRUD — questions are hardcoded in seed JSON
+### Phase 2 — Depth ✅ (Complete)
+8. ✅ Avatar upload (crop → WebP → compress → Supabase Storage)
 9. ✅ Mood/emotion analysis (real-time editor + auto-save)
 10. ✅ Search & filter (full-text search on timeline)
 11. ✅ Note detail with LLM analysis display (timeline detail + explore)
+12. ✅ Custom SMTP (Resend) for transactional emails
+13. ✅ Magic Link authentication
+14. ✅ Password reset (email-based)
+15. ✅ Email change (2-step verification: old email → new email)
 
 ### Phase 3 — Insights 🟡 (Partially Complete)
-12. ❌ Weekly/monthly summary generation
-13. ✅ Insights dashboard (mood trend chart) — `/app/insights`
-14. ❌ Semantic search / vector embeddings
-15. ❌ Question-answering over past notes (RAG)
+16. ✅ Weekly summary generation
+17. ✅ Insights dashboard (mood trend chart)
+18. ❌ Semantic search / vector embeddings
+19. ❌ Question-answering over past notes (RAG)
+
+## Auth Flow
+
+### Login
+- Step 1: Enter email → Step 2: Choose "Send magic link" or "Enter password"
+- Magic link sent via Resend SMTP (no Supabase credit usage)
+
+### Signup
+- Email + password only (magic link not available for new users)
+- Confirmation email sent via Resend SMTP
+- After confirmation, redirects to /auth/callback → /app
+
+### Password Reset
+- Settings page: "パスワードをリセット" button
+- Sends reset email → link to /app/update-password
+- Enter new password → confirm → update
+
+### Email Change (2-step)
+- Settings page: "メールアドレスを変更" button
+- Step 1: Verification email to CURRENT address → link to /app/change-email?token=xxx
+- Step 2: Enter new email → confirmation email to NEW address
+- Step 3: Confirm → Admin API applies change
+
+### Account Deletion
+- Two-step confirmation (type "削除")
+- Deletes: auth user, notes, analyses, insights, summaries, avatar from storage
 
 ## Name Origin
 

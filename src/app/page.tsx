@@ -23,7 +23,7 @@ export default function LandingPage() {
         <div className='min-h-screen bg-bg-primary'>
             <header className='sticky top-0 z-40 bg-bg-primary/80 backdrop-blur-sm border-b border-border'>
                 <div className='max-w-6xl mx-auto px-6 h-14 flex items-center justify-between'>
-                    <span className='text-sm text-text-primary tracking-tight font-medium'>
+                    <span className='text-base tracking-tight font-semibold'>
                         Minamo
                     </span>
                     <nav className='flex items-center gap-8'>
@@ -37,7 +37,7 @@ export default function LandingPage() {
                         <a
                             href='/login'
                             onClick={e => handleAuthRedirect(e, 'signup')}
-                            className='text-sm px-5 py-2 bg-text-primary text-bg-primary rounded-full hover:opacity-90 transition-opacity'
+                            className='text-sm px-5 py-2 bg-accent text-white rounded-full hover:opacity-90 transition-opacity'
                         >
                             始める
                         </a>
@@ -50,7 +50,7 @@ export default function LandingPage() {
                 <section className='max-w-6xl mx-auto px-6 pt-16 pb-0 md:pt-24 md:pb-0'>
                     <div className='grid md:grid-cols-2 gap-12'>
                         <div className='max-w-xl pt-8 md:pt-16 pb-16 md:pb-20'>
-                            <p className='text-xs text-text-secondary tracking-[0.15em] mb-6'>
+                            <p className='text-[11px] text-text-secondary/70 tracking-[0.2em] mb-6 uppercase'>
                                 水面 — Minamo
                             </p>
                             <h1 className='text-4xl sm:text-5xl lg:text-6xl font-light text-text-primary leading-[1.1] tracking-[-1px] sm:tracking-[-1.5px] md:tracking-[-2px]'>
